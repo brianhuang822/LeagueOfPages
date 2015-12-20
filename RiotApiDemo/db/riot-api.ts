@@ -1,8 +1,6 @@
 ﻿import q = require('q');
 import rp = require('request-promise');
-import mongoose = require('mongoose');
 import dbConnection = require('./db-connection');
-import Promise1 = Q.IPromise;
 
 export class RiotApi {
     
@@ -94,7 +92,7 @@ export class RiotApi {
     }
 
     private getSummonerApiUrl(): string {
-        return this.riotApiUrl + '/v2.5/league/challenger?type=RANKED_SOLO_5x5&api_key=' + this.apiKey;
+        return this.riotApiUrl + '/v2.5/league/challenger?type=RANKED_SOLO_5x5&seasons=SEASON2015&api_key=' + this.apiKey;
     }
 
     private getMatchListApiUrl(summonerId: string): string {

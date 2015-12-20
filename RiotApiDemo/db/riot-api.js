@@ -86,7 +86,7 @@ var RiotApi = (function () {
         });
     };
     RiotApi.prototype.getSummonerApiUrl = function () {
-        return this.riotApiUrl + '/v2.5/league/challenger?type=RANKED_SOLO_5x5&api_key=' + this.apiKey;
+        return this.riotApiUrl + '/v2.5/league/challenger?type=RANKED_SOLO_5x5&seasons=SEASON2015&api_key=' + this.apiKey;
     };
     RiotApi.prototype.getMatchListApiUrl = function (summonerId) {
         return this.riotApiUrl + '/v2.2/matchlist/by-summoner/' + summonerId + '?api_key=' + this.apiKey;

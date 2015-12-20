@@ -23,8 +23,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 var riotApiClient = new riotApi.RiotApi(apiKey, region);
+/* Call these in order */
 //riotApiClient.getChallengerMatchIds();
-riotApiClient.getMatches();
+//riotApiClient.getMatches();
 registerErrorHandlers();
 var port = process.env.PORT || 3000;
 var server = app.listen(port, function () {
