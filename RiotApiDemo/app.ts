@@ -35,7 +35,7 @@ app.use('/users', users);
 
 var riotApiClient = new riotApi.RiotApi(apiKey, region);
 /* Call these in order */
-//riotApiClient.getChallengerMatchIds();
+riotApiClient.getChallengerMatchIds();
 //riotApiClient.getMatches();
 
 

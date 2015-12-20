@@ -9,10 +9,11 @@ var RiotApi = (function () {
     }
     RiotApi.prototype.getChallengerMatchIds = function () {
         var self = this;
-        self.getSummonerIds();
+        self.getSummonerIds('challenger');
+        self.getSummonerIds('master');
         setTimeout(function () {
             self.getMatchLists();
-        }, self.timeout);
+        }, self.timeout * 2);
     };
     RiotApi.prototype.getMatches = function () {
         console.log('Registering callback for Matches...');
@@ -34,9 +35,9 @@ var RiotApi = (function () {
             }
         });
     };
-    RiotApi.prototype.getSummonerIds = function () {
+    RiotApi.prototype.getSummonerIds = function (league) {
         var self = this;
-        rp(this.getSummonerApiUrl()).then(function (data) {
+        rp(self.getSummonerApiUrl(league)).then(function (data) {
             console.log('Saving Summoner IDs');
             data = JSON.parse(data);
             data.entries.forEach(function (player) {
@@ -85,8 +86,8 @@ var RiotApi = (function () {
             self.db.RiotMatch.findOneAndUpdate(sameMatchId, { $set: matchObj }, { upsert: true }).exec();
         });
     };
-    RiotApi.prototype.getSummonerApiUrl = function () {
-        return this.riotApiUrl + '/v2.5/league/challenger?type=RANKED_SOLO_5x5&seasons=SEASON2015&api_key=' + this.apiKey;
+    RiotApi.prototype.getSummonerApiUrl = function (league) {
+        return this.riotApiUrl + '/v2.5/league/' + league + '?type=RANKED_SOLO_5x5&seasons=PRESEASON2016&api_key=' + this.apiKey;
     };
     RiotApi.prototype.getMatchListApiUrl = function (summonerId) {
         return this.riotApiUrl + '/v2.2/matchlist/by-summoner/' + summonerId + '?api_key=' + this.apiKey;

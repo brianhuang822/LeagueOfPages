@@ -11,10 +11,11 @@ export class RiotApi {
 
     getChallengerMatchIds(): void {
         var self = this;
-        self.getSummonerIds();
+        self.getSummonerIds('challenger');
+        self.getSummonerIds('master');
         setTimeout(() => {
             self.getMatchLists();
-        }, self.timeout);
+        }, self.timeout * 2);
     }
 
     getMatches(): void {
@@ -37,9 +38,9 @@ export class RiotApi {
         });
     }
 
-    private getSummonerIds(): void {
+    private getSummonerIds(league: string): void {
         var self = this;
-        rp(this.getSummonerApiUrl()).then(data => {
+        rp(self.getSummonerApiUrl(league)).then(data => {
             console.log('Saving Summoner IDs');
             data = JSON.parse(data);
             data.entries.forEach(player => {
@@ -91,8 +92,8 @@ export class RiotApi {
         });
     }
 
-    private getSummonerApiUrl(): string {
-        return this.riotApiUrl + '/v2.5/league/challenger?type=RANKED_SOLO_5x5&seasons=SEASON2015&api_key=' + this.apiKey;
+    private getSummonerApiUrl(league: string): string {
+        return this.riotApiUrl + '/v2.5/league/' + league + '?type=RANKED_SOLO_5x5&seasons=PRESEASON2016&api_key=' + this.apiKey;
     }
 
     private getMatchListApiUrl(summonerId: string): string {
