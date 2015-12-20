@@ -10,24 +10,20 @@ var RiotApi = (function () {
     RiotApi.prototype.getChallengerMatchIds = function () {
         var self = this;
         self.getSummonerIds('challenger');
+        self.waitForApiCooldown();
         self.getSummonerIds('master');
-        setTimeout(function () {
-            self.getMatchLists();
-        }, self.timeout * 2);
+        self.waitForApiCooldown();
+        self.getMatchLists();
     };
     RiotApi.prototype.getMatches = function () {
-        console.log('Registering callback for Matches...');
         var self = this;
         self.db.RiotMatchId.find({ isStored: false }).lean().exec(function (err, matchIdObjs) {
             if (!err) {
-                //                matchIdObjs.length = 10;
                 for (var i = 0; i < matchIdObjs.length; i++) {
                     var matchId = matchIdObjs[i].matchId;
-                    var timeoutCallback = function (matchId) { return function () {
-                        console.log('Executing callback for Match: ' + matchId);
-                        self.getMatch(matchId);
-                    }; };
-                    setTimeout(timeoutCallback(matchId), i * self.timeout);
+                    console.log('Getting MatchList for Match: ' + matchId);
+                    self.getMatch(matchId);
+                    self.waitForApiCooldown();
                 }
             }
             else {
@@ -53,12 +49,9 @@ var RiotApi = (function () {
                 //                summonerIdObjs.length = 1;
                 for (var i = 0; i < summonerIdObjs.length; i++) {
                     var summonerId = summonerIdObjs[i].summonerId;
-                    console.log('Registering callback for Summoner: ' + summonerId);
-                    var timeoutCallback = function (summonerId) { return function () {
-                        console.log('Executing callback for Summoner: ' + summonerId);
-                        self.getMatchList(summonerId);
-                    }; };
-                    setTimeout(timeoutCallback(summonerId), i * self.timeout);
+                    console.log('Getting MatchList for Summoner: ' + summonerId);
+                    self.getMatchList(summonerId);
+                    self.waitForApiCooldown();
                 }
             }
             else {
@@ -102,6 +95,11 @@ var RiotApi = (function () {
         enumerable: true,
         configurable: true
     });
+    RiotApi.prototype.waitForApiCooldown = function () {
+        var start = new Date().getTime();
+        while (new Date().getTime() < start + this.timeout)
+            ;
+    };
     return RiotApi;
 })();
 exports.RiotApi = RiotApi;

@@ -12,25 +12,21 @@ export class RiotApi {
     getChallengerMatchIds(): void {
         var self = this;
         self.getSummonerIds('challenger');
+        self.waitForApiCooldown();
         self.getSummonerIds('master');
-        setTimeout(() => {
-            self.getMatchLists();
-        }, self.timeout * 2);
+        self.waitForApiCooldown();
+        self.getMatchLists();
     }
 
     getMatches(): void {
-        console.log('Registering callback for Matches...');
         var self = this;
         self.db.RiotMatchId.find({ isStored: false }).lean().exec((err, matchIdObjs) => {
             if (!err) {
-//                matchIdObjs.length = 10;
                 for (var i = 0; i < matchIdObjs.length; i++) {
                     var matchId = matchIdObjs[i].matchId;
-                    var timeoutCallback = (matchId: string) => () => {
-                        console.log('Executing callback for Match: ' + matchId);
-                        self.getMatch(matchId);
-                    }
-                    setTimeout(timeoutCallback(matchId), i * self.timeout);
+                    console.log('Getting MatchList for Match: ' + matchId);
+                    self.getMatch(matchId);
+                    self.waitForApiCooldown();
                 }
             } else {
                 throw err;
@@ -57,12 +53,9 @@ export class RiotApi {
 //                summonerIdObjs.length = 1;
                 for (var i = 0; i < summonerIdObjs.length; i++) {
                     var summonerId = summonerIdObjs[i].summonerId;
-                    console.log('Registering callback for Summoner: ' + summonerId);
-                    var timeoutCallback = (summonerId: string) => () => {
-                        console.log('Executing callback for Summoner: ' + summonerId);
-                        self.getMatchList(summonerId);
-                    }
-                    setTimeout(timeoutCallback(summonerId), i * self.timeout);
+                    console.log('Getting MatchList for Summoner: ' + summonerId);
+                    self.getMatchList(summonerId);
+                    self.waitForApiCooldown();
                 }
             } else {
                 throw err;
@@ -106,6 +99,11 @@ export class RiotApi {
 
     private get riotApiUrl(): string {
         return 'https://' + this.region + '.api.pvp.net/api/lol/' + this.region;
+    }
+
+    private waitForApiCooldown(): void {
+        var start = new Date().getTime();
+        while (new Date().getTime() < start + this.timeout);
     }
 
     private timeout: number = 1250;
