@@ -1,7 +1,7 @@
 
 *.js.map
 *.ntvs_analysis.dat
-
+.idea/
 # Logs and databases #
 ######################
 *.log
