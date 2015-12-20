@@ -34,7 +34,8 @@
   </PropertyGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
-    <TypeScriptCompile Include="db\DbConnection.ts" />
+    <TypeScriptCompile Include="db\db-connection.ts" />
+    <TypeScriptCompile Include="db\riot-api.ts" />
     <TypeScriptCompile Include="routes\index.ts" />
     <TypeScriptCompile Include="routes\users.ts" />
     <Content Include="package.json" />
@@ -52,6 +53,7 @@
     <TypeScriptCompile Include="typings\mongoose\mongoose.d.ts" />
     <TypeScriptCompile Include="typings\morgan\morgan.d.ts" />
     <TypeScriptCompile Include="typings\node\node.d.ts" />
+    <TypeScriptCompile Include="typings\q\Q.d.ts" />
     <TypeScriptCompile Include="typings\request-promise\request-promise.d.ts" />
     <TypeScriptCompile Include="typings\request\request.d.ts" />
     <TypeScriptCompile Include="typings\serve-favicon\serve-favicon.d.ts" />
@@ -72,6 +74,7 @@
     <Folder Include="typings\mongoose\" />
     <Folder Include="typings\morgan\" />
     <Folder Include="typings\node\" />
+    <Folder Include="typings\q\" />
     <Folder Include="typings\request-promise\" />
     <Folder Include="typings\request\" />
     <Folder Include="typings\serve-favicon\" />

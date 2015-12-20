@@ -2,6 +2,7 @@
 
 import mongoose = require('mongoose');
 
+var connectionString = 'mongodb://localhost:27017/riot-api-demo';
 var noSchema: mongoose.Schema = new mongoose.Schema({}, { strict: false });
 
 
@@ -11,7 +12,7 @@ export class DbConnection {
     RiotMatchId: mongoose.Model<any> = mongoose.model<any>('RiotMatchIds', noSchema);
     RiotMatch: mongoose.Model<any> = mongoose.model<any>('RiotMatches', noSchema);
     
-    constructor(connectionString: string) {
+    constructor() {
         mongoose.connect(connectionString);
         var db = mongoose.connection;
         db.on('error', console.error.bind(console, 'connection error:'));

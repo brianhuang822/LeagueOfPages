@@ -1,8 +1,9 @@
 /// <reference path="../typings/tsd.d.ts" />
 var mongoose = require('mongoose');
+var connectionString = 'mongodb://localhost:27017/riot-api-demo';
 var noSchema = new mongoose.Schema({}, { strict: false });
 var DbConnection = (function () {
-    function DbConnection(connectionString) {
+    function DbConnection() {
         this.RiotSummonerId = mongoose.model('RiotSummonerIds', noSchema);
         this.RiotMatchId = mongoose.model('RiotMatchIds', noSchema);
         this.RiotMatch = mongoose.model('RiotMatches', noSchema);
@@ -14,4 +15,4 @@ var DbConnection = (function () {
     return DbConnection;
 })();
 exports.DbConnection = DbConnection;
-//# sourceMappingURL=DbConnection.js.map
+//# sourceMappingURL=db-connection.js.map

@@ -11,9 +11,9 @@ import bodyParser = require('body-parser');
 import routes = require('./routes/index');
 import users = require('./routes/users');
 
-import dbConnection = require("./db/DbConnection");
-var connectionString = 'mongodb://localhost:27017/riot-api-demo';
-
+import riotApi = require('./db/riot-api');
+var apiKey = 'e912989b-9609-40f5-90ad-f8b0b1930342';
+var region = 'kr';
 
 var app = express();
 
@@ -33,10 +33,12 @@ app.use('/', routes);
 app.use('/users', users);
 
 
-var db = new dbConnection.DbConnection(connectionString);
+var riotApiClient = new riotApi.RiotApi(apiKey, region);
+//riotApiClient.getChallengerMatchIds();
+riotApiClient.getMatches();
+
 
 registerErrorHandlers();
-
 
 var port: number = process.env.PORT || 3000;
 var server = app.listen(port, () => {
