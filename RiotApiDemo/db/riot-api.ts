@@ -1,5 +1,5 @@
-﻿import q = require('q');
-import rp = require('request-promise');
+﻿var q = require('q');
+var rp = require('request-promise');
 import dbConnection = require('./db-connection');
 
 export class RiotApi {
@@ -9,79 +9,79 @@ export class RiotApi {
         this.region = region;
     }
 
-    getChallengerMatchIds(): void {
+    getChallengerAndMasterMatchIds(): void {
         var self = this;
-        self.getSummonerIds('challenger');
-        self.waitForApiCooldown();
-        self.getSummonerIds('master');
-        self.waitForApiCooldown();
-        self.getMatchLists();
+        var promises = [self.getSummonerIds('challenger'), self.getSummonerIds('master')];
+        q.all(promises).then((result) => {
+            console.log('Challenger and Master Summoner Ids:');
+            var summonerIds = result[0].concat(result[1]);
+            console.log('setting timeout...');
+            setTimeout(() => {
+                self.getMatchLists(summonerIds);
+            }, self.timeout * 2);
+        });
     }
 
     getMatches(): void {
         var self = this;
-        self.db.RiotMatchId.find({ isStored: false }).lean().exec((err, matchIdObjs) => {
-            if (!err) {
-                for (var i = 0; i < matchIdObjs.length; i++) {
-                    var matchId = matchIdObjs[i].matchId;
-                    console.log('Getting MatchList for Match: ' + matchId);
-                    self.getMatch(matchId);
-                    self.waitForApiCooldown();
+        self.db.RiotMatchId.find({}).lean().exec((err, matchIdObjs) => {
+            console.log('Getting ' + matchIdObjs.length + ' Matches...');
+            var interval = setInterval(() => {
+                if (matchIdObjs.length > 0) {
+                    var matchIdObj = matchIdObjs.splice(0, 1)[0];
+                    var matchId = matchIdObj.matchId;
+                    self.getMatch(matchId, matchIdObj._id);
+                } else {
+                    clearInterval(interval);
                 }
-            } else {
-                throw err;
-            }
+            }, self.timeout);
         });
     }
 
-    private getSummonerIds(league: string): void {
+    private getSummonerIds(league: string): any {
         var self = this;
-        rp(self.getSummonerApiUrl(league)).then(data => {
-            console.log('Saving Summoner IDs');
+        return rp(self.getSummonerApiUrl(league)).then(data => {
             data = JSON.parse(data);
-            data.entries.forEach(player => {
-                var summonerIdObj = { summonerId: player.playerOrTeamId };
-                self.db.RiotSummonerId.findOneAndUpdate(summonerIdObj, { $set: summonerIdObj }, { upsert: true }).exec();
+            return data.entries.map(summonerEntry => {
+                return summonerEntry.playerOrTeamId;
             });
         });
     }
 
-    private getMatchLists(): void {
+    private getMatchLists(summonerIds: string[]): void {
+        console.log('Getting ' + summonerIds.length + ' MatchLists...');
         var self = this;
-        self.db.RiotSummonerId.find({}).lean().exec((err, summonerIdObjs) => {
-            if (!err) {
-//                summonerIdObjs.length = 1;
-                for (var i = 0; i < summonerIdObjs.length; i++) {
-                    var summonerId = summonerIdObjs[i].summonerId;
-                    console.log('Getting MatchList for Summoner: ' + summonerId);
-                    self.getMatchList(summonerId);
-                    self.waitForApiCooldown();
-                }
+        var interval = setInterval(() => {
+            if (summonerIds.length > 0) {
+                var summonerId = summonerIds.splice(0, 1)[0];
+                self.getMatchList(summonerId);
             } else {
-                throw err;
+                clearInterval(interval);
             }
-        });
+        }, self.timeout);
     }
 
-    private getMatchList(summonerId: string): q.IPromise<void> {
+    private getMatchList(summonerId: string): void {
+        console.log('Requesting MatchList for Summoner: ' + summonerId);
         var self = this;
-        return rp(this.getMatchListApiUrl(summonerId)).then(data => {
+        rp(this.getMatchListApiUrl(summonerId)).then(data => {
             data = JSON.parse(data);
             data.matches.forEach(match => {
-                var matchIdObj = { summonerId: summonerId, matchId: match.matchId};
-                var sameMatchId = { matchId: match.matchId, isStored: false };
-                return self.db.RiotMatchId.findOneAndUpdate(sameMatchId, { $set: matchIdObj }, { upsert: true }).exec();
+                var matchIdObj = { matchId: match.matchId};
+                self.db.RiotMatchId.findOneAndUpdate(matchIdObj, { $set: matchIdObj }, { upsert: true }).exec();
             });
         });
     }
 
-    private getMatch(matchId: string): Promise<void> {
+    private getMatch(matchId: string, dbId: string): void {
+        console.log('Getting Match: ' + matchId);
         var self = this;
-        return rp(this.getMatchApiUrl(matchId)).then(data => {
+        rp(this.getMatchApiUrl(matchId)).then(data => {
             data = JSON.parse(data);
             var matchObj = data;
             var sameMatchId = { matchId: matchObj.matchId };
             self.db.RiotMatch.findOneAndUpdate(sameMatchId, { $set: matchObj }, { upsert: true }).exec();
+            self.db.RiotMatchId.findByIdAndRemove(dbId).exec();
         });
     }
 

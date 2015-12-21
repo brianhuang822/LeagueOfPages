@@ -39,6 +39,9 @@
     <TypeScriptCompile Include="routes\index.ts" />
     <TypeScriptCompile Include="routes\users.ts" />
     <Content Include="package.json" />
+    <Content Include="public\favicon.ico" />
+    <Content Include="public\stylesheets\style.css" />
+    <Content Include="public\stylesheets\style.less" />
     <Content Include="README.md" />
     <Content Include="tsd.json" />
     <Content Include="views\index.jade" />
@@ -62,6 +65,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="db\" />
+    <Folder Include="public\" />
+    <Folder Include="public\stylesheets\" />
     <Folder Include="routes\" />
     <Folder Include="typings\" />
     <Folder Include="typings\bluebird\" />

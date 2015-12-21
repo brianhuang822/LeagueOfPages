@@ -32,11 +32,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 
-
+console.log(new Date().toLocaleString());
 var riotApiClient = new riotApi.RiotApi(apiKey, region);
-/* Call these in order */
-riotApiClient.getChallengerMatchIds();
-//riotApiClient.getMatches();
+
+/* Call these separately in order */
+//riotApiClient.getChallengerAndMasterMatchIds();
+riotApiClient.getMatches();
 
 
 registerErrorHandlers();

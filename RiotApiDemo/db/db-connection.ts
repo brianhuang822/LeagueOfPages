@@ -3,14 +3,12 @@
 import mongoose = require('mongoose');
 
 var connectionString = 'mongodb://localhost:27017/riot-api-demo';
-var noSchema: mongoose.Schema = new mongoose.Schema({}, { strict: false });
-
+var matchIdSchema: mongoose.Schema = new mongoose.Schema({ matchId: { type: String, unique: true } });
+var matchSchema: mongoose.Schema = new mongoose.Schema({ matchId: { type: String, unique: true } }, { strict: false });
 
 export class DbConnection {
-    
-    RiotSummonerId: mongoose.Model<any> = mongoose.model<any>('RiotSummonerIds', noSchema);
-    RiotMatchId: mongoose.Model<any> = mongoose.model<any>('RiotMatchIds', noSchema);
-    RiotMatch: mongoose.Model<any> = mongoose.model<any>('RiotMatches', noSchema);
+    RiotMatchId: mongoose.Model<any> = mongoose.model<any>('RiotMatchIds', matchIdSchema);
+    RiotMatch: mongoose.Model<any> = mongoose.model<any>('RiotMatches', matchSchema);
     
     constructor() {
         mongoose.connect(connectionString);
