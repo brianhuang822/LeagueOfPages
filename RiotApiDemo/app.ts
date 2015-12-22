@@ -36,8 +36,8 @@ console.log(new Date().toLocaleString());
 var riotApiClient = new riotApi.RiotApi(apiKey, region);
 
 /* Call these separately in order */
-//riotApiClient.getChallengerAndMasterMatchIds();
-riotApiClient.getMatches();
+riotApiClient.getChallengerAndMasterMatchIds();
+//riotApiClient.getMatches();
 
 
 registerErrorHandlers();

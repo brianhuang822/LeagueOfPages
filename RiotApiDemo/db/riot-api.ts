@@ -66,10 +66,12 @@ export class RiotApi {
         var self = this;
         rp(this.getMatchListApiUrl(summonerId)).then(data => {
             data = JSON.parse(data);
-            data.matches.forEach(match => {
-                var matchIdObj = { matchId: match.matchId};
-                self.db.RiotMatchId.findOneAndUpdate(matchIdObj, { $set: matchIdObj }, { upsert: true }).exec();
-            });
+            if (data.matches) {
+                data.matches.forEach(match => {
+                    var matchIdObj = { matchId: match.matchId };
+                    self.db.RiotMatchId.findOneAndUpdate(matchIdObj, { $set: matchIdObj }, { upsert: true }).exec();
+                });
+            }
         });
     }
 
@@ -90,7 +92,7 @@ export class RiotApi {
     }
 
     private getMatchListApiUrl(summonerId: string): string {
-        return this.riotApiUrl + '/v2.2/matchlist/by-summoner/' + summonerId + '?api_key=' + this.apiKey;
+        return this.riotApiUrl + '/v2.2/matchlist/by-summoner/' + summonerId + '?rankedQueues=RANKED_SOLO_5x5&seasons=PRESEASON2016&api_key=' + this.apiKey;
     }
 
     private getMatchApiUrl(matchId: string) : string {
